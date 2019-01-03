@@ -1,2 +1,6 @@
 #IntelliJ project files. 
 .idea/
+
+# Ignore generated configuration files
+bquellhorst-demo-auth-config-map.yml
+bquellhorst-demo.cfg

@@ -1,4 +1,4 @@
-# Template out the basic kubectl configuration.
+# Template out the basic kubectl configuration for contacting this cluster.
 
 locals {
   kubeconfig = <<KUBECONFIG
@@ -31,5 +31,28 @@ KUBECONFIG
 
 resource "local_file" "kubeconfig" {
   content = "${local.kubeconfig}"
-  filename = "../${path.module}/bquellhorst-demo.cfg"
+  filename = "${path.module}/../bquellhorst-demo.cfg"
+}
+
+# Template
+locals {
+  config_map_aws_auth = <<CONFIGMAPAWSAUTH
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: ${aws_iam_role.demo-node.arn}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+CONFIGMAPAWSAUTH
+}
+
+resource "local_file" "cluster-auth" {
+  content = "${local.config_map_aws_auth}"
+  filename = "${path.module}/../bquellhorst-demo-auth-config-map.yml"
 }

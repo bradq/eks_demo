@@ -4,12 +4,26 @@ set -e
 
 # Find the true root directory of this project
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-pushd $DIR/terraform
 
+# Create cluster master and worker nodes
+pushd $DIR/terraform
 terraform init
 terraform -vars-file bradq.tfvars plan
 terraform -vars-file bradq.tfvars apply
+popd
 
-# Configure our local Kubernetes client
+# Use this configuration for the duration of the script's run
+export KUBECONFIG="$DIR/bquellhorst-demo.cfg"
 
-# Apply pod manifest
+# Configure our local Kubernetes client with a namespaced cluster
+kubectl config set-cluster bquellhorst-demo
+
+# Apply master-side identity mappings
+kubectl --kubeconfig=bquellhorst-demo.cfg apply -f bquellhorst-demo-auth-config-map.yml
+
+# Create namespace and deploy pod
+kubectl create namespace webapp-example
+kubectl apply -f sample-webapp-pod.yml
+kubectl describe services/webapp-example
+
+kubectl expose service webapp-demo-lb  --namespace webapp-example

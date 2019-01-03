@@ -1,2 +1,4 @@
+# Ignore state; if preserved it should be remote.
 terraform.tfstate*
 .terraform
+

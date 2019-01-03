@@ -8,6 +8,12 @@ variable "region" {
   type = "string"
 }
 
+variable "subnet-count" {
+  default = 2
+  description = "Subnets to construct in our VPC. Limited to the number of available AZs in your chosen region"
+  type = "string"
+}
+
 variable "source-ip" {
   description = "IPv4 address to allow inbound access, expressed in CIDR format"
   type = "string"
@@ -15,7 +21,7 @@ variable "source-ip" {
 }
 
 variable "worker-node-type" {
-  description = "AWS instance type to use for worker node provisioning"
+  description = "AWS instance type to use for worker node instances"
   type = "string"
   default = "t2.small"
 }
