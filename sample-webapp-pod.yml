@@ -17,6 +17,7 @@ template:
     containers:
       - name: webapp-demo
         image: training/webapp
+        imagePullPolicy: "IfNotPresent"
         ports:
           - containerPort: 5000
         resources:
@@ -26,20 +27,47 @@ template:
             memory: "100Mi"
         command: ["python"]
         args: ["app.py"]
-  ---
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: webapp-demo-lb
-    namespace: webapp-example
-    labels:
-      run: webapp-demo
-  spec:
-    selector:
-      app: webapp-demo
-    type: LoadBalancer
-    ports:
-      - name: "http"
-        port: 80
-        targetPort: 5000
-        protocol: "TCP"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: webapp-dns
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: webapp-demo
+    spec:
+      hostNetwork: false
+      containers:
+        - name: external-dns
+          image: registry.opensource.zalan.do/teapot/external-dns:latest
+          args:
+            - --source=service
+            - --source=ingress
+            - --provider=aws
+            - --policy=upsert-only # prevent ExternalDNS from deleting any records, omit to enable full synchronization
+            - --aws-zone-type=public # only look at public hosted zones (valid values are public, private or no value for both)
+            - --registry=txt
+            - --txt-owner-id=my-identifier
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/target-hostname: webapp-demo.bradq.com
+  name: webapp-demo-lb
+  namespace: webapp-example
+  labels:
+    run: webapp-demo
+spec:
+  selector:
+    app: webapp-demo
+  type: LoadBalancer
+  ports:
+    - name: "http"
+      port: 80
+      targetPort: 5000
+      protocol: "TCP"
+

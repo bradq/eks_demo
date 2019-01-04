@@ -8,14 +8,14 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # Create cluster master and worker nodes
 pushd $DIR/terraform
 terraform init
-terraform -vars-file bradq.tfvars plan
-terraform -vars-file bradq.tfvars apply
+terraform plan
+terraform apply
 popd
 
-# Use this configuration for the duration of the script's run
+# Use this cluster's configuration for the duration of the script's run
 export KUBECONFIG="$DIR/bquellhorst-demo.cfg"
 
-# Configure our local Kubernetes client with a namespaced cluster
+# Configure our local Kubernetes client with the proper cluster
 kubectl config set-cluster bquellhorst-demo
 
 # Apply master-side identity mappings
@@ -24,6 +24,3 @@ kubectl --kubeconfig=bquellhorst-demo.cfg apply -f bquellhorst-demo-auth-config-
 # Create namespace and deploy pod
 kubectl create namespace webapp-example
 kubectl apply -f sample-webapp-pod.yml
-kubectl describe services/webapp-example
-
-kubectl expose service webapp-demo-lb  --namespace webapp-example

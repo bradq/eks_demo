@@ -5,12 +5,15 @@ A demonstration Kubernetes deployment effected via Terraform.
 ### Prerequisites
 
 In order to properly use this code repository, the following should be available locally:
-* Administrative access to Amazon Web Services provided by on of the standard [authentication provider chain](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html).
+* Administrative access to necessary Amazon Web Services provided by on of the standard [authentication provider chain](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html).
 * 2 provisioned IAM user accounts for administrative and test access
 * Modern Terraform (tested against latest 0.11.11 with AWS provider 1.54.0)
-* An unconfigured installation of `kubectl`
-* A populated `terraform.tfvars` file. Use the `terraform.tfvars.sample` file as a basis. 
+* A current installation of `kubectl`
+* An altered service definition for `sample-webapp-prod` using a 
 * [`aws-iam-authenticator`]() installed locally (`go get -u -v github.com/kubernetes-sigs/aws-iam-authenticator/cmd/aws-iam-authenticator`)
+
+Your AWS account should be populated with:
+* An existing Route53 domain matching the one selected above.
 
 ### Use
 Presuming the above requirements are fulfilled, execute "build.sh" at the root of the web directory. 

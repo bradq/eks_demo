@@ -1,6 +1,12 @@
 variable "cluster-name" {
   default = "bquellhorst-eks-demo"
-  type    = "string"
+  type = "string"
+}
+
+variable "dns-arn" {
+  description = "If desired, a restricted ARN pattern for Route53 rights"
+  default = "arn:aws:route53:::hostedzone/*"
+  type = "string"
 }
 
 variable "region" {

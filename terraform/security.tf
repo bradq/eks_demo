@@ -49,7 +49,7 @@ resource "aws_security_group" "demo-node" {
 }
 
 resource "aws_security_group_rule" "demo-node-ingress-self" {
-  description              = "Allow node to communicate with each other"
+  description              = "Allow nodes to communicate with each other"
   from_port                = 0
   protocol                 = "-1"
   security_group_id        = "${aws_security_group.demo-node.id}"

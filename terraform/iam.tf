@@ -61,6 +61,40 @@ resource "aws_iam_role_policy" "eks_cluster_ingress_loadbalancer_creation" {
 POLICY
 }
 
+# This policy is granted to the worker nodes so as to allow the external-dns container appropriate rights to
+# alter DNS. Ideally we'd be distributing these to an individual container role but I'm not certain that's
+# available for EKS at the moment.
+resource "aws_iam_role_policy" "eks_cluster_node_dns_management" {
+  name   = "eks_cluster_node_dns_management"
+  role       = "${aws_iam_role.demo-node.name}"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Effect": "Allow",
+     "Action": [
+       "route53:ChangeResourceRecordSets"
+     ],
+     "Resource": [
+       "${var.dns-arn}"
+     ]
+   },
+   {
+     "Effect": "Allow",
+     "Action": [
+       "route53:ListHostedZones",
+       "route53:ListResourceRecordSets"
+     ],
+     "Resource": [
+       "*"
+     ]
+   }
+  ]
+}
+POLICY
+}
+
 # Attach prefab AWS Kubernetes service policies. Convenient but hardly appropriate for any multitenant production account.
 # Note that the use of aws_iam_role_policy_attachment is quite important; the similar aws_iam_policy_attachment
 # manages *all* attachments of a role; destruction or recreation will remove the policy from all roles.
@@ -88,7 +122,7 @@ resource "aws_iam_role_policy_attachment" "demo-node-AmazonEKS_CNI_Policy" {
   role       = "${aws_iam_role.demo-node.name}"
 }
 
-# Omitted the direct copy here at this time, but this manifest *should* be modified to pull the application
+# Omitted adding this to scope, but this manifest *should* be modified to pull the application
 # from a locally controlled repository. Tags in public repositories are both revokable and replaceable,
 # so some assurance should be made that your immutable application container stays...immutable.
 resource "aws_iam_role_policy_attachment" "demo-node-AmazonEC2ContainerRegistryReadOnly" {
