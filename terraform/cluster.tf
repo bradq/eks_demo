@@ -30,7 +30,7 @@ USERDATA
 
 # Provision an autoscaling group of worker nodes.
 resource "aws_launch_configuration" "demo" {
-  associate_public_ip_address = false
+  associate_public_ip_address = true
   iam_instance_profile        = "${aws_iam_instance_profile.demo-node.name}"
   image_id                    = "${data.aws_ami.eks-worker.id}"
   instance_type               = "${var.worker-node-type}"
