@@ -19,3 +19,6 @@ data "aws_availability_zones" "available" {}
 
 # Rely on local settings for region.
 data "aws_region" "current" {}
+
+# Fetch the provisioning account ID to restrict the admin user role principal
+data "aws_caller_identity" "current" {}

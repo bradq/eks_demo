@@ -1,48 +1,53 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: webapp-deployment
+  name: webapp-demo
+  namespace: webapp-example
 spec:
   selector:
     matchLabels:
       app: webapp-demo
-    replicas: 3
-template:
-  metadata:
-    name: webapp-demo
-    namespace: webapp-example
-    labels:
-      app: webapp-demo
-  spec:
-    containers:
-      - name: webapp-demo
-        image: training/webapp
-        imagePullPolicy: "IfNotPresent"
-        ports:
-          - containerPort: 5000
-        resources:
-          limits:
-            memory: "200Mi"
-          requests:
-            memory: "100Mi"
-        command: ["python"]
-        args: ["app.py"]
+  replicas: 3
+  template:
+    metadata:
+      name: webapp-demo
+      labels:
+        app: webapp-demo
+    spec:
+      containers:
+        - name: webapp-demo
+          image: training/webapp
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5000
+          resources:
+            limits:
+              memory: "200Mi"
+            requests:
+              memory: "100Mi"
+          command: ["python"]
+          args: ["app.py"]
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: webapp-dns
+  namespace: webapp-example
 spec:
+  selector:
+    matchLabels:
+      app: webapp-dns
   replicas: 1
   template:
     metadata:
       labels:
-        app: webapp-demo
+        app: webapp-dns
     spec:
       hostNetwork: false
       containers:
         - name: external-dns
           image: registry.opensource.zalan.do/teapot/external-dns:latest
+          imagePullPolicy: "IfNotPresent"
           args:
             - --source=service
             - --source=ingress

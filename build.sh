@@ -5,10 +5,13 @@ set -e
 # Find the true root directory of this project
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+# Little ad-hoc resource cleanup
+rm -f bquellhorst-demo-auth-config-map.yml
+rm -f bquellhorst-demo.cfg
+
 # Create cluster master and worker nodes
 pushd $DIR/terraform
 terraform init
-terraform plan
 terraform apply
 popd
 
@@ -19,8 +22,8 @@ export KUBECONFIG="$DIR/bquellhorst-demo.cfg"
 kubectl config set-cluster bquellhorst-demo
 
 # Apply master-side identity mappings
-kubectl --kubeconfig=bquellhorst-demo.cfg apply -f bquellhorst-demo-auth-config-map.yml
+kubectl apply -f bquellhorst-demo-auth-config-map.yml
 
 # Create namespace and deploy pod
 kubectl create namespace webapp-example
-kubectl apply -f sample-webapp-pod.yml
+kubectl apply -f sample-webapp-pods.yml

@@ -49,6 +49,10 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
+    - rolearn: ${aws_iam_role.eks-admin.arn}
+      username: admin
+      groups:
+        - system:master
 CONFIGMAPAWSAUTH
 }
 
